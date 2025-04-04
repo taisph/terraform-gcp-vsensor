@@ -2,6 +2,7 @@ resource "google_service_account" "vsensor" {
   display_name = "Darktrace vSensor Quickstart"
   description  = "Allows permission to Darktrace vSensors for logging/monitoring and to read/write PCAPs to Storage Bucket (if enabled)"
   account_id   = "${local.deployment_id}-sa"
+  project      = var.project_id
 }
 
 resource "google_project_iam_member" "vsensor" {

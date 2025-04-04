@@ -4,6 +4,7 @@ resource "google_storage_bucket" "vsensor_pcaps" {
   count = var.retention_time_days == 0 ? 0 : 1
 
   name          = "${local.deployment_id}-vsensor-pcaps"
+  project       = var.project_id
   location      = var.region
   storage_class = "STANDARD"
   force_destroy = true

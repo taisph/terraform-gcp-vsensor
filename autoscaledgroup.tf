@@ -1,4 +1,5 @@
 resource "google_compute_instance_template" "vsensor" {
+  project     = var.project_id
   name_prefix = "${local.deployment_id}-vsensor-template"
 
   tags = [
@@ -20,7 +21,7 @@ resource "google_compute_instance_template" "vsensor" {
   }
 
   disk {
-    source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts"
+    source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2404-lts-amd64"
     auto_delete  = true
     boot         = true
     disk_size_gb = 20
@@ -136,7 +137,8 @@ resource "google_compute_region_autoscaler" "vsensor" {
 }
 
 resource "google_compute_health_check" "vsensor" {
-  name = "${local.deployment_id}-healthcheck"
+  name    = "${local.deployment_id}-healthcheck"
+  project = var.project_id
 
   https_health_check {
     port         = "443"

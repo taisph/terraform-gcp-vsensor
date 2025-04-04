@@ -3,6 +3,7 @@ resource "google_compute_subnetwork" "vsensor_bastion" {
 
   name          = "${local.deployment_id}-vsensor-bastion-subnet"
   ip_cidr_range = var.bastion_subnet_cidr
+  project       = var.project_id
   region        = var.region
 
   network                  = local.network_name
@@ -15,6 +16,7 @@ resource "google_service_account" "vsensor_bastion" {
   display_name = "Darktrace vSensor Quickstart bastion"
   description  = "Allows Bastion to send logs / metrics from Monitoring Ops Agent"
   account_id   = "${local.deployment_id}-bastion-sa"
+  project      = var.project_id
 }
 
 resource "google_project_iam_member" "vsensor_bastion_mon" {
@@ -40,6 +42,7 @@ resource "google_compute_address" "vsensor_bastion_external" {
 
   address_type = "EXTERNAL"
   network_tier = "PREMIUM"
+  project      = var.project_id
   region       = var.region
 }
 
@@ -47,6 +50,7 @@ resource "google_compute_instance_template" "vsensor_bastion" {
   count = local.bastion ? 1 : 0
 
   name_prefix = "${local.deployment_id}-bastion-template"
+  project     = var.project_id
 
   tags = [
     "darktrace-vsensor-bastion"
@@ -64,7 +68,7 @@ resource "google_compute_instance_template" "vsensor_bastion" {
   }
 
   disk {
-    source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts"
+    source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2404-lts-amd64"
     auto_delete  = true
     boot         = true
     disk_size_gb = 10
@@ -84,8 +88,9 @@ resource "google_compute_instance_template" "vsensor_bastion" {
 resource "google_compute_instance_from_template" "vsensor_bastion_vm" {
   count = local.bastion ? 1 : 0
 
-  name = "${local.deployment_id}-vsensor-bastion-vm"
-  zone = local.mig_zone[0]
+  name    = "${local.deployment_id}-vsensor-bastion-vm"
+  project = var.project_id
+  zone    = local.mig_zone[0]
 
   source_instance_template = google_compute_instance_template.vsensor_bastion[0].self_link_unique
 
@@ -105,6 +110,7 @@ resource "google_compute_firewall" "vsensor_bastion_fw" {
 
   name        = "${local.deployment_id}-bastion-fw"
   network     = local.network_name
+  project     = var.project_id
   description = "Allow ssh to bastion."
 
   priority = "1000"

@@ -1,6 +1,7 @@
 resource "google_compute_region_backend_service" "vsensor" {
   name                            = "${local.deployment_id}-lb-backend"
   description                     = "TCP Load Balancer for accepting Traffic Mirroring"
+  project                         = var.project_id
   region                          = var.region
   health_checks                   = [google_compute_health_check.vsensor.self_link]
   connection_draining_timeout_sec = 300
@@ -38,8 +39,9 @@ resource "google_compute_packet_mirroring" "vsensor" {
   #Changing the description will replace the resource instead of trying "update in-place" which doesn't work
   description = "Packet mirroring policy - ${local.filter_description}"
 
-  name   = "${local.deployment_id}-mirroring-policy"
-  region = var.region
+  name    = "${local.deployment_id}-mirroring-policy"
+  project = var.project_id
+  region  = var.region
 
   network {
     url = local.network_self_link
