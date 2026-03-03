@@ -11,6 +11,8 @@ resource "google_compute_region_backend_service" "vsensor" {
   backend {
     balancing_mode = "CONNECTION"
     group          = google_compute_region_instance_group_manager.vsensor.instance_group
+
+    max_connections_per_instance = 10
   }
 }
 
