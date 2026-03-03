@@ -88,7 +88,7 @@ resource "google_compute_region_instance_group_manager" "vsensor" {
 
   auto_healing_policies {
     health_check      = google_compute_health_check.vsensor.self_link
-    initial_delay_sec = 600
+    initial_delay_sec = var.mig_hc_initial_delay
   }
 
   version {
@@ -144,4 +144,8 @@ resource "google_compute_health_check" "vsensor" {
     port         = "443"
     request_path = "/healthcheck"
   }
+
+  unhealthy_threshold = var.mig_hc_unhealthy_threshold
+  check_interval_sec  = var.mig_hc_interval
+  timeout_sec         = var.mig_hc_timeout
 }

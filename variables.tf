@@ -292,3 +292,47 @@ variable "bastion_ssh_cidr" {
     error_message = "The CIDR ranges in the bastion_ssh_cidr list must be in the form x.x.x.x/x, or do not provide any value if bastion is not enabled."
   }
 }
+
+variable "mig_hc_unhealthy_threshold" {
+  type        = number
+  description = "Number of consecutive health check failures before an instance is marked unhealthy. A healthy instance will be recreated if the number of consecutive failures exceeds this threshold. Setting this to 0 will disable recreating unhealthy instances. The default is 2."
+  default     = 2
+}
+
+variable "mig_hc_interval" {
+  type        = number
+  description = "Time (in seconds) between health checks. The default is 5 seconds."
+  default     = 5
+
+  validation {
+    condition = alltrue([
+      var.mig_hc_interval >= 0,
+    ])
+    error_message = "The health check interval must be a positive number."
+  }
+}
+
+variable "mig_hc_timeout" {
+  type        = number
+  description = "Time (in seconds) that a health check waits for a response before marking the check as failed. The default is 5 seconds. Must be less than or equal to `mig_hc_interval`."
+  default     = 5
+
+  validation {
+    condition = alltrue([
+      var.mig_hc_timeout >= 0,
+      var.mig_hc_timeout <= var.mig_hc_interval
+    ])
+    error_message = "The health check timeout must be positive and less than or equal to the health check interval."
+  }
+}
+
+variable "mig_hc_initial_delay" {
+  type        = number
+  description = "The number of seconds that the managed instance group waits before it applies autohealing policies to new instances or instances that have just been recreated. This gives the instance time to boot and for the health check to succeed. The default is 600 seconds."
+  default     = 600
+
+  validation {
+    condition = var.mig_hc_initial_delay >= 0 && var.mig_hc_initial_delay <= 3600
+    error_message = "The initial delay must be between 0 and 3600 seconds."
+  }
+}
